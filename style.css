@@ -178,7 +178,7 @@
   @media (max-width:960px){.teaser-grid{grid-template-columns:1fr 1fr}}
   @media (max-width:640px){.teaser-grid{grid-template-columns:1fr}}
 
-  .card-top.has-img{height:auto;aspect-ratio:1614/975;background-color:var(--blue-100)}
+  .card-top.has-img{height:auto;aspect-ratio:1672/941;background-color:var(--blue-100)}
 
   .flag{display:flex;gap:8px;align-items:center}
   .flag img{width:44px;height:30px;object-fit:cover;border-radius:5px;box-shadow:0 2px 6px rgba(0,0,0,.35);background:#fff}
