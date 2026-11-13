@@ -5,10 +5,10 @@
 const SITE = {
   name: "TravelKita Tours",
   website: "www.travelkita-tours.com",
-  waNumber: "62XXXXXXXXXX",           // GANTI: format 62..., tanpa tanda + atau 0 di depan
-  waDisplay: "0XXX-XXXX-XXXX",        // GANTI: nomor yang tampil di footer
-  email: "",                          // isi jika ada, kosong = tidak ditampilkan
-  instagram: "",                      // isi tanpa @, kosong = tidak ditampilkan
+  waNumber: "6281932825098",           // GANTI: format 62..., tanpa tanda + atau 0 di depan
+  waDisplay: "0819-3282-5098",        // GANTI: nomor yang tampil di footer
+  email: "travelkitabekasi@gmail.com",                          // isi jika ada, kosong = tidak ditampilkan
+  instagram: "travelkitatours",                      // isi tanpa @, kosong = tidak ditampilkan
   address: "",                        // isi alamat kantor, kosong = tidak ditampilkan
   hours: "Senin sampai Sabtu, 09.00 sampai 17.00"
 };
