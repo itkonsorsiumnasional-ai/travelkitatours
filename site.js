@@ -269,11 +269,11 @@ const rupiah = n => "Rp " + n.toLocaleString("id-ID");
 const findPackage = slug => PACKAGES.find(p => p.slug === slug);
 
 const NAV = [
-  ["home",     "index.html",         "Beranda"],
-  ["paket",    "paket.html",         "Paket Wisata"],
-  ["layanan",  "layanan.html",       "Layanan"],
-  ["dokumentasi", "dokumentasi.html", "Dokumentasi"],
-  ["kontak",   "kontak.html",        "Kontak"]
+  ["home",     "beranda",         "Beranda"],
+  ["paket",    "/paket wisata",         "Paket Wisata"],
+  ["layanan",  "/layanan",       "Layanan"],
+  ["dokumentasi", "/dokumentasi", "Dokumentasi"],
+  ["kontak",   "/kontak",        "Kontak"]
 ];
 
 function packageCard(p){
