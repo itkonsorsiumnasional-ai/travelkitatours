@@ -262,6 +262,32 @@ const PACKAGES = [
 ];
 
 /* ============================================================
+   DATA DARI PANEL ADMIN (/admin)
+   Paket dan foto yang ditambah lewat panel admin disimpan di
+   admin-data.js, lalu digabung otomatis ke daftar di atas.
+   Bagian ini tidak perlu diubah.
+   ============================================================ */
+const BUILTIN_PACKAGES = PACKAGES.slice();   // salinan daftar asli, dipakai panel admin
+if (document.readyState === "loading") {
+  document.write('<script src="/admin-data.js?t=' + Math.floor(Date.now() / 60000) + '"><\/script>');
+}
+function applyAdminData(){
+  const d = window.ADMIN_DATA;
+  if (!d) return;
+  (d.hidden || []).forEach(slug => {
+    const i = PACKAGES.findIndex(p => p.slug === slug);
+    if (i > -1) PACKAGES.splice(i, 1);
+  });
+  (d.packages || []).forEach(p => {
+    const i = PACKAGES.findIndex(x => x.slug === p.slug);
+    if (i > -1) PACKAGES[i] = p;
+    else if (p.featured) PACKAGES.unshift(p);
+    else PACKAGES.push(p);
+  });
+  if (typeof DOCS !== "undefined" && Array.isArray(d.docs)) d.docs.forEach(x => DOCS.push(x));
+}
+
+/* ============================================================
    Bagian di bawah ini tidak perlu diubah
    ============================================================ */
 const wa = msg => `https://wa.me/${SITE.waNumber}?text=${encodeURIComponent(msg)}`;
@@ -357,6 +383,7 @@ function renderFooter(){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  applyAdminData();
   const active = document.body.dataset.page;
   const h = document.getElementById("site-header");
   const f = document.getElementById("site-footer");
