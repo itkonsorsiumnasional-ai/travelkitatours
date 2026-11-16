@@ -109,5 +109,21 @@ window.ADMIN_DATA = {
     }
   ],
   "hidden": [],
-  "docs": []
+  "docs": [
+    {
+      "src": "/img/dok-1794808421011-0.jpg",
+      "cap": "Bangkok Damone",
+      "cat": "Thailand"
+    },
+    {
+      "src": "/img/dok-1794808421012-1.jpg",
+      "cap": "Bangkok Pattaya",
+      "cat": "Thailand"
+    },
+    {
+      "src": "/img/dok-1794808421012-2.jpg",
+      "cap": "Bangkok Pattaya",
+      "cat": "Thailand"
+    }
+  ]
 };
