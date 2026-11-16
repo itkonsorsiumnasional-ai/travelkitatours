@@ -111,18 +111,8 @@ window.ADMIN_DATA = {
   "hidden": [],
   "docs": [
     {
-      "src": "/img/dok-1794808421011-0.jpg",
-      "cap": "Bangkok Damone",
-      "cat": "Thailand"
-    },
-    {
-      "src": "/img/dok-1794808421012-1.jpg",
-      "cap": "Bangkok Pattaya",
-      "cat": "Thailand"
-    },
-    {
-      "src": "/img/dok-1794808421012-2.jpg",
-      "cap": "Bangkok Pattaya",
+      "src": "/img/dok-1794808517735-0.jpg",
+      "cap": "Noongch Village Bangkok",
       "cat": "Thailand"
     }
   ]
