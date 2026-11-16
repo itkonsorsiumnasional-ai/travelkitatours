@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Detail Paket | TravelKita Tours</title>
+<link rel="canonical" href="https://travelkita-tours.com/detail">
 <meta name="description" content="Detail paket tour TravelKita Tours: itinerary, jadwal keberangkatan, fasilitas, dan syarat ketentuan.">
 <meta property="og:image" content="logo.jpg">
 <link rel="icon" href="logo.jpg">
@@ -69,7 +70,7 @@
 <main>
   <section class="page-hero" style="padding-bottom:70px">
     <div class="wrap">
-      <div class="crumbs"><a href="index.html">Beranda</a> / <a href="paket.html">Paket Wisata</a> / <span id="crumb">Detail</span></div>
+      <div class="crumbs"><a href="/">Beranda</a> / <a href="/paket">Paket Wisata</a> / <span id="crumb">Detail</span></div>
       <h1 id="title">Detail Paket</h1>
       <p id="subtitle"></p>
     </div>
@@ -104,7 +105,7 @@
       root.innerHTML = `<div class="d-box" style="margin-top:-34px;position:relative;z-index:2;text-align:center">
         <h2>Paket tidak ditemukan</h2>
         <p>Paket yang Anda cari mungkin sudah tidak tersedia.</p>
-        <a class="btn btn-wa" href="paket.html">Lihat semua paket</a></div>`;
+        <a class="btn btn-wa" href="/paket">Lihat semua paket</a></div>`;
       return;
     }
 
@@ -195,7 +196,7 @@
             <div class="d-meta"><span>${p.days} hari ${p.nights} malam</span><span>${p.type === "Thailand" ? "1 Negara" : p.type}</span></div>
             <p style="color:var(--muted);margin:0">Harga dan jadwal bisa berubah mengikuti musim. Konfirmasi dulu lewat WhatsApp ya.</p>
             <a class="btn btn-wa" href="${wa(msg)}" target="_blank" rel="noopener">Pesan lewat WhatsApp</a>
-            <a class="btn btn-outline" href="paket.html">Lihat paket lain</a>
+            <a class="btn btn-outline" href="/paket">Lihat paket lain</a>
           </div>
           ${schedHtml}
         </aside>
