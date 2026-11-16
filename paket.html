@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Paket Wisata | TravelKita Tours</title>
+<link rel="canonical" href="https://travelkita-tours.com/paket">
 <meta name="description" content="Daftar paket tour Malaysia, Singapore, dan Thailand dari TravelKita Tours. Pilih paket 2 negara, 3 negara, atau Thailand, lalu pesan lewat WhatsApp.">
 <meta property="og:title" content="Paket Wisata | TravelKita Tours">
 <meta property="og:image" content="logo.jpg">
@@ -39,7 +40,7 @@
 <main>
   <section class="page-hero" style="padding-bottom:70px">
     <div class="wrap">
-      <div class="crumbs"><a href="index.html">Beranda</a> / Paket Wisata</div>
+      <div class="crumbs"><a href="/">Beranda</a> / Paket Wisata</div>
       <h1>Paket Wisata</h1>
       <p>Tour Malaysia, Singapore, dan Thailand dengan jadwal keberangkatan tetap. Pilih paket yang cocok, lalu tanyakan jadwal dan harga terbaru lewat WhatsApp.</p>
     </div>
@@ -126,7 +127,7 @@
     const quick = [["all","Semua"],["3 Negara","3 Negara"],["2 Negara","2 Negara"],["Thailand","Thailand"]];
     chips.innerHTML = quick.map(([v,l]) => `<button type="button" class="chip" data-v="${v}">${l}</button>`).join("");
 
-    // Baca pilihan dari alamat, misalnya paket.html?type=2%20Negara
+    // Baca pilihan dari alamat, misalnya /paket?type=2%20Negara
     const q = new URLSearchParams(location.search);
     const setIfValid = (el, v) => { if (v && [...el.options].some(o => o.value === v)) el.value = v; };
     setIfValid(fDest, q.get("dest")); setIfValid(fType, q.get("type")); setIfValid(fDur, q.get("dur"));
