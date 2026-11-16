@@ -269,7 +269,7 @@ const rupiah = n => "Rp " + n.toLocaleString("id-ID");
 const findPackage = slug => PACKAGES.find(p => p.slug === slug);
 
 const NAV = [
-  ["home",     "beranda",         "Beranda"],
+  ["home",     "/",              "Beranda"],
   ["paket",    "/paket",         "Paket Wisata"],
   ["layanan",  "/layanan",       "Layanan"],
   ["dokumentasi", "/dokumentasi", "Dokumentasi"],
@@ -278,7 +278,7 @@ const NAV = [
 
 function packageCard(p){
   const msg = `Halo TravelKita, saya tertarik paket ${p.name} (${p.days} hari ${p.nights} malam). Boleh minta jadwal dan harga terbaru?`;
-  const detail = `detail.html?p=${p.slug}`;
+  const detail = `/detail?p=${p.slug}`;
   const price = p.price
     ? `<small>Mulai dari</small><strong>${rupiah(p.price)}</strong>/orang`
     : `<small>Harga</small><strong>Hubungi kami</strong>`;
@@ -312,7 +312,7 @@ function renderHeader(active){
   return `
   <header>
     <div class="wrap nav">
-      <a href="beranda" class="brand" aria-label="${SITE.name}">
+      <a href="/" class="brand" aria-label="${SITE.name}">
         <img src="logo.jpg" alt="Logo TravelKita" width="122" height="50">
       </a>
       <nav id="menu" aria-label="Menu utama"><ul>${links}</ul></nav>
@@ -328,7 +328,7 @@ function renderFooter(){
     <div class="wrap">
       <div class="foot-grid">
         <div>
-          <a class="foot-brand" href="beranda"><img src="logo.jpg" alt="${SITE.name}" width="112" height="46"></a>
+          <a class="foot-brand" href="/"><img src="logo.jpg" alt="${SITE.name}" width="112" height="46"></a>
           <p>Paket wisata, tiket pesawat, dan sewa bus untuk perjalanan yang nyaman.</p>
         </div>
         <div>
@@ -368,8 +368,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Halaman Kenapa Kami dan Cara Pesan digabung menjadi Dokumentasi
-  document.querySelectorAll('a[href="kenapa-kami.html"], a[href="cara-pesan.html"]').forEach(a => {
-    a.href = "dokumentasi.html"; a.textContent = "Lihat dokumentasi perjalanan";
+  document.querySelectorAll('a[href="/kenapa-kami"], a[href="/cara-pesan"]').forEach(a => {
+    a.href = "/dokumentasi"; a.textContent = "Lihat dokumentasi perjalanan";
   });
 
   const toggle = document.getElementById("menuToggle");
