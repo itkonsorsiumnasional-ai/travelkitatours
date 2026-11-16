@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Panel Admin | TravelKita Tours</title>
+<link rel="icon" href="logo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#14246b;--navy2:#213a9a;--red:#e8192c;--red2:#c10f20;--sky:#1aa7e8;--soft:#f3f6fc;--line:#dde4f3;--text:#1b2340;--muted:#5b6580;--ok:#1b8a4b;--radius:16px;--shadow:0 8px 24px rgba(20,36,107,.10)}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Nunito',system-ui,sans-serif;background:var(--soft);color:var(--text);line-height:1.55;padding-bottom:90px}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif;color:var(--navy);margin:0 0 .4em;line-height:1.2}
+  a{color:var(--navy2)}
+  .wrap{width:min(1080px,100% - 28px);margin-inline:auto}
+  .top{background:#fff;box-shadow:0 2px 12px rgba(20,36,107,.10);position:sticky;top:0;z-index:20}
+  .top::after{content:"";display:block;height:4px;background:linear-gradient(90deg,var(--navy2) 0 50%,var(--red) 50% 85%,var(--sky) 85%)}
+  .top .wrap{display:flex;align-items:center;gap:14px;padding:10px 0;flex-wrap:wrap}
+  .top img{height:42px;width:auto;display:block}
+  .top .ttl{font-family:'Baloo 2',sans-serif;font-weight:800;color:var(--navy);font-size:1.15rem}
+  .top .repo{margin-left:auto;color:var(--muted);font-size:.88rem}
+  .tabs{display:flex;gap:6px;margin:20px 0 18px;flex-wrap:wrap}
+  .tab{border:2px solid var(--line);background:#fff;color:var(--navy);font:inherit;font-weight:800;border-radius:999px;padding:8px 20px;cursor:pointer}
+  .tab.on{background:var(--navy2);border-color:var(--navy2);color:#fff}
+  .box{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;margin-bottom:18px}
+  .box h2{font-size:1.3rem}
+  .muted{color:var(--muted)}
+  .btn{display:inline-block;border:2px solid transparent;border-radius:12px;font:inherit;font-weight:800;padding:10px 20px;cursor:pointer;text-decoration:none;text-align:center;background:var(--red);color:#fff}
+  .btn:hover{background:var(--red2)}
+  .btn.o{background:#fff;color:var(--navy2);border-color:var(--navy2)}
+  .btn.o:hover{background:var(--navy2);color:#fff}
+  .btn.g{background:var(--soft);color:var(--navy);border-color:var(--line)}
+  .btn.g:hover{background:var(--line)}
+  .btn.d{background:#fff;color:var(--red2);border-color:#f3b3b9}
+  .btn.d:hover{background:var(--red);color:#fff;border-color:var(--red)}
+  .btn.s{padding:6px 14px;font-size:.9rem;border-radius:10px}
+  .btn[disabled]{opacity:.55;cursor:wait}
+  label{display:block;font-weight:800;color:var(--navy);margin:14px 0 4px;font-size:.95rem}
+  label small{font-weight:600;color:var(--muted)}
+  input[type=text],input[type=number],input[type=date],input[type=password],select,textarea{width:100%;padding:10px 13px;border:2px solid var(--line);border-radius:12px;font:inherit;color:var(--text);background:#fff}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy2)}
+  textarea{min-height:92px;resize:vertical}
+  .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .hint{color:var(--muted);font-size:.88rem;margin:4px 0 0}
+  .err{background:#fdecee;color:var(--red2);border-radius:12px;padding:12px 16px;font-weight:700;margin:14px 0}
+  .okbox{background:#e8f6ee;color:var(--ok);border-radius:12px;padding:12px 16px;font-weight:700;margin:14px 0}
+  .steps{padding-left:20px;margin:8px 0 0}
+  .steps li{margin:7px 0}
+  code{background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:.9em}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+  .pc{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+  .pc.hid{opacity:.6}
+  .pc .th{height:130px;background:linear-gradient(135deg,var(--navy),var(--navy2));background-size:cover;background-position:center top;position:relative}
+  .badge{position:absolute;top:10px;left:10px;border-radius:999px;font-weight:800;font-size:.75rem;padding:3px 12px;background:#fff;color:var(--navy)}
+  .badge.new{background:var(--red);color:#fff}
+  .badge.changed{background:var(--sky);color:#fff}
+  .badge.hidden{background:#555;color:#fff}
+  .pc .bd{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .pc h3{font-size:1.05rem;margin:0}
+  .pc .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .chip{background:var(--soft);border:2px solid var(--line);border-radius:999px;padding:3px 6px 3px 12px;font-weight:700;font-size:.9rem}
+  .chip.pk{border-color:#f3b3b9;color:var(--red2)}
+  .chip button{border:0;background:transparent;cursor:pointer;font-size:1rem;color:var(--muted);padding:0 6px}
+  .day{border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0;background:#fbfcff}
+  .day .dh{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .day b{color:var(--navy)}
+  .sect{border-top:1px solid var(--line);margin-top:22px;padding-top:6px}
+  .seg{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+  .seg label{margin:0;display:flex;align-items:center;gap:6px;border:2px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer;font-weight:700;background:#fff}
+  .seg input{width:auto;margin:0}
+  .imgprev{max-width:260px;max-height:200px;border-radius:12px;display:block;margin-top:10px;border:1px solid var(--line)}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;box-shadow:0 -6px 20px rgba(20,36,107,.16);z-index:30;display:none;border-top:4px solid var(--red)}
+  .bar.on{display:block}
+  .bar .wrap{display:flex;align-items:center;gap:14px;padding:12px 0;flex-wrap:wrap}
+  .bar b{color:var(--navy)}
+  .bar .btn{margin-left:auto}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:100px;background:var(--navy);color:#fff;font-weight:700;border-radius:12px;padding:12px 20px;z-index:50;display:none;max-width:90vw;text-align:center}
+  .toast.on{display:block}
+  .toast.bad{background:var(--red2)}
+  .doc{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .doc img{width:100%;height:150px;object-fit:cover;display:block;background:var(--soft)}
+  .doc .bd{padding:10px 12px 12px}
+  .top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+  @media (max-width:600px){.box{padding:18px 16px}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <img src="logo.jpg" alt="TravelKita">
+    <span class="ttl">Panel Admin</span>
+    <span class="repo" id="repoInfo"></span>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+<div class="bar" id="bar"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<datalist id="dlType"><option value="3 Negara"><option value="2 Negara"><option value="Thailand"></datalist>
+<datalist id="dlDest"></datalist>
+
+<script src="site.js"></script>
+<script>
+(() => {
+  /* ---------- Status ---------- */
+  const LS_KEY = "tk_admin_cfg_v1";
+  const EMPTY = () => ({ packages: [], hidden: [], docs: [] });
+  const COLORS = ["#14246b,#213a9a", "#213a9a,#1aa7e8", "#14246b,#e8192c", "#e8192c,#ff7a85", "#14246b,#1aa7e8"];
+  const DOC_CATS = ["Malaysia", "Singapore", "Thailand", "Keberangkatan"];
+
+  let cfg = loadCfg();
+  let data = EMPTY();
+  let pending = {};     // path file -> base64 (tanpa awalan data:)
+  let pendingUrl = {};  // path file -> data URL untuk pratinjau
+  let dirty = false;
+  let tab = "paket";
+  let editing = null;   // formulir paket yang sedang dibuka
+  let docDraft = [];    // foto dokumentasi yang baru dipilih
+  let loading = false;
+  let loadError = "";
+
+  const $ = s => document.querySelector(s);
+  const app = $("#app");
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const rp = n => "Rp " + Number(n).toLocaleString("id-ID");
+  const lines = v => String(v || "").split("\n").map(x => x.trim()).filter(Boolean);
+  const clone = o => JSON.parse(JSON.stringify(o));
+
+  function loadCfg(){ try { return JSON.parse(localStorage.getItem(LS_KEY)) || {}; } catch (e) { return {}; } }
+  function saveCfg(){ try { localStorage.setItem(LS_KEY, JSON.stringify(cfg)); } catch (e) {} }
+
+  let toastT;
+  function toast(msg, bad){
+    const t = $("#toast"); t.textContent = msg; t.className = "toast on" + (bad ? " bad" : "");
+    clearTimeout(toastT); toastT = setTimeout(() => t.className = "toast", bad ? 6000 : 3200);
+  }
+
+  /* ---------- GitHub API ---------- */
+  const toB64 = s => { let bin = ""; new TextEncoder().encode(s).forEach(c => bin += String.fromCharCode(c)); return btoa(bin); };
+  const fromB64 = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, "")), c => c.charCodeAt(0)));
+
+  function gh(path, opt = {}){
+    return fetch("https://api.github.com" + path, Object.assign({}, opt, {
+      headers: Object.assign({ "Accept": "application/vnd.github+json", "Authorization": "Bearer " + cfg.token, "X-GitHub-Api-Version": "2022-11-28" }, opt.headers || {})
+    }));
+  }
+  const repoPath = () => `/repos/${cfg.owner}/${cfg.repo}`;
+  const encPath = p => p.split("/").map(encodeURIComponent).join("/");
+
+  async function getFile(path){
+    const r = await gh(`${repoPath()}/contents/${encPath(path)}?ref=${encodeURIComponent(cfg.branch || "main")}`);
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error(await apiError(r));
+    return r.json();
+  }
+  async function putFile(path, b64, message, sha){
+    const body = { message, content: b64, branch: cfg.branch || "main" };
+    if (sha) body.sha = sha;
+    const r = await gh(`${repoPath()}/contents/${encPath(path)}`, { method: "PUT", body: JSON.stringify(body) });
+    if (!r.ok) throw new Error(await apiError(r));
+    return r.json();
+  }
+  async function apiError(r){
+    let m = ""; try { m = (await r.json()).message || ""; } catch (e) {}
+    if (r.status === 401) return "Token ditolak GitHub (salah atau sudah kedaluwarsa). Buat token baru di Pengaturan.";
+    if (r.status === 403) return "Token tidak punya izin menulis ke repo ini. Pastikan izin Contents = Read and write. " + m;
+    if (r.status === 404) return "Repo tidak ditemukan atau token tidak punya akses ke repo itu. Cek nama akun dan nama repo.";
+    return `Gagal (${r.status}). ${m}`;
+  }
+
+  async function loadData(){
+    loading = true; loadError = ""; render();
+    try {
+      const f = await getFile("admin-data.js");
+      data = EMPTY();
+      if (f) {
+        const m = fromB64(f.content).match(/^\s*window\.ADMIN_DATA\s*=\s*([\s\S]*?);\s*$/);
+        if (m) data = Object.assign(EMPTY(), JSON.parse(m[1]));
+      }
+      pending = {}; pendingUrl = {}; dirty = false;
+    } catch (e) { loadError = e.message || String(e); }
+    loading = false; render();
+  }
+
+  async function publish(){
+    const btn = $("#pubBtn"); if (btn) { btn.disabled = true; btn.textContent = "Menerbitkan..."; }
+    try {
+      const used = new Set([...data.packages.map(p => p.image), ...data.docs.map(d => d.src)].filter(Boolean).map(x => String(x).replace(/^\//, "")));
+      for (const [path, b64] of Object.entries(pending)) {
+        if (!used.has(path)) continue;
+        const ex = await getFile(path);
+        await putFile(path, b64, "Admin: unggah " + path, ex && ex.sha);
+      }
+      const cur = await getFile("admin-data.js");
+      const content = "window.ADMIN_DATA = " + JSON.stringify(data, null, 2) + ";\n";
+      await putFile("admin-data.js", toB64(content), "Admin: perbarui paket dan dokumentasi", cur && cur.sha);
+      pending = {}; pendingUrl = {}; dirty = false;
+      toast("Berhasil diterbitkan. Website diperbarui dalam 1 sampai 3 menit.");
+    } catch (e) { toast(e.message || String(e), true); }
+    render();
+  }
+
+  /* ---------- Gambar ---------- */
+  function resizeImage(file, max, q){
+    return new Promise((res, rej) => {
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = () => {
+        const s = Math.min(1, max / Math.max(img.width, img.height));
+        const w = Math.round(img.width * s), h = Math.round(img.height * s);
+        const c = document.createElement("canvas"); c.width = w; c.height = h;
+        const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, w, h); x.drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url); res(c.toDataURL("image/jpeg", q));
+      };
+      img.onerror = () => rej(new Error("File gambar tidak bisa dibaca: " + file.name));
+      img.src = url;
+    });
+  }
+  const b64Of = dataUrl => dataUrl.split(",")[1];
+  const imgSrc = p => (p && pendingUrl[String(p).replace(/^\//, "")]) || p || "";
+
+  /* ---------- Daftar paket gabungan ---------- */
+  function allPackages(){
+    const hidden = new Set(data.hidden), out = [];
+    BUILTIN_PACKAGES.forEach(b => {
+      const ov = data.packages.find(p => p.slug === b.slug);
+      out.push({ slug: b.slug, pkg: ov || b, builtin: b, status: hidden.has(b.slug) ? "hidden" : ov ? "changed" : "builtin" });
+    });
+    data.packages.filter(p => !BUILTIN_PACKAGES.some(b => b.slug === p.slug)).forEach(p => out.push({ slug: p.slug, pkg: p, status: "new" }));
+    return out;
+  }
+  const STATUS_LABEL = { builtin: "Bawaan", changed: "Diubah", new: "Baru", hidden: "Disembunyikan" };
+
+  /* ---------- Tampilan ---------- */
+  function render(){
+    $("#repoInfo").textContent = cfg.token && cfg.owner ? `${cfg.owner}/${cfg.repo} (${cfg.branch || "main"})` : "";
+    if (!cfg.token) { app.innerHTML = viewSetup(); bindSetup(); updateBar(); return; }
+    if (loading) { app.innerHTML = `<div class="box" style="margin-top:24px"><h2>Memuat data...</h2><p class="muted">Mengambil data terbaru dari GitHub.</p></div>`; updateBar(); return; }
+    if (loadError) {
+      app.innerHTML = `<div class="box" style="margin-top:24px"><h2>Tidak bisa terhubung</h2><div class="err">${esc(loadError)}</div>
+        <button class="btn" id="retry">Coba lagi</button> <button class="btn g" id="toSet">Ubah pengaturan</button></div>`;
+      $("#retry").onclick = loadData; $("#toSet").onclick = () => { cfg.token = ""; saveCfg(); loadError = ""; render(); };
+      updateBar(); return;
+    }
+    if (editing) { app.innerHTML = viewForm(); bindForm(); updateBar(); return; }
+    app.innerHTML = viewMain(); bindMain(); updateBar();
+  }
+
+  function updateBar(){
+    const bar = $("#bar");
+    if (dirty && !editing && cfg.token && !loading) {
+      bar.className = "bar on";
+      bar.innerHTML = `<div class="wrap"><span><b>Ada perubahan yang belum diterbitkan.</b> <span class="muted">Website belum berubah sebelum Anda menekan tombol.</span></span>
+        <button class="btn" id="pubBtn">Terbitkan ke Website</button></div>`;
+      $("#pubBtn").onclick = publish;
+    } else { bar.className = "bar"; bar.innerHTML = ""; }
+  }
+  window.addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+  /* ----- Setup ----- */
+  function viewSetup(){
+    return `<div class="box" style="margin-top:24px">
+      <h2>Hubungkan panel ke website</h2>
+      <p class="muted">Cukup dilakukan sekali di perangkat ini. Panel memakai kunci akses (token) dari GitHub supaya bisa menyimpan paket baru ke website Anda.</p>
+      ${cfg.error ? `<div class="err">${esc(cfg.error)}</div>` : ""}
+      <div class="row">
+        <div><label for="sOwner">Nama akun GitHub</label><input id="sOwner" type="text" placeholder="contoh: travelkita" value="${esc(cfg.owner || "")}" autocomplete="off"></div>
+        <div><label for="sRepo">Nama repo website</label><input id="sRepo" type="text" placeholder="contoh: travelkita-tours" value="${esc(cfg.repo || "")}" autocomplete="off"></div>
+        <div><label for="sBranch">Branch <small>(biasanya main)</small></label><input id="sBranch" type="text" value="${esc(cfg.branch || "main")}" autocomplete="off"></div>
+      </div>
+      <label for="sToken">Token GitHub</label>
+      <input id="sToken" type="password" placeholder="github_pat_..." autocomplete="off">
+      <p class="hint">Token hanya disimpan di browser perangkat ini, tidak dikirim ke tempat lain selain GitHub. Jangan dipakai di komputer umum.</p>
+      <p><button class="btn" id="sGo">Hubungkan</button></p>
+    </div>
+    <div class="box">
+      <h2>Cara membuat token (sekitar 2 menit)</h2>
+      <ol class="steps">
+        <li>Buka GitHub dan masuk ke akun pemilik repo website.</li>
+        <li>Klik foto profil kanan atas, lalu <b>Settings</b>.</li>
+        <li>Paling bawah menu kiri: <b>Developer settings</b>, lalu <b>Personal access tokens</b>, lalu <b>Fine-grained tokens</b>.</li>
+        <li>Klik <b>Generate new token</b>. Beri nama, misalnya <code>panel-admin</code>. Pilih masa berlaku (misalnya 1 tahun).</li>
+        <li>Di <b>Repository access</b> pilih <b>Only select repositories</b>, lalu pilih repo website TravelKita.</li>
+        <li>Di <b>Permissions</b>, buka <b>Repository permissions</b>, cari <b>Contents</b>, ubah menjadi <b>Read and write</b>.</li>
+        <li>Klik <b>Generate token</b>, salin token yang muncul, tempel di kolom di atas.</li>
+      </ol>
+    </div>`;
+  }
+  function bindSetup(){
+    $("#sGo").onclick = async () => {
+      const owner = $("#sOwner").value.trim(), repo = $("#sRepo").value.trim(), branch = $("#sBranch").value.trim() || "main", token = $("#sToken").value.trim();
+      if (!owner || !repo || !token) { cfg = Object.assign(cfg, { owner, repo, branch, error: "Isi nama akun, nama repo, dan token dulu ya." }); render(); return; }
+      const b = $("#sGo"); b.disabled = true; b.textContent = "Memeriksa...";
+      cfg = { owner, repo, branch, token };
+      try {
+        const r = await gh(repoPath());
+        if (!r.ok) throw new Error(await apiError(r));
+        const j = await r.json();
+        if (j.permissions && !j.permissions.push) throw new Error("Token hanya bisa membaca repo. Ubah izin Contents menjadi Read and write.");
+        saveCfg(); await loadData();
+      } catch (e) { cfg = { owner, repo, branch, error: e.message }; render(); }
+    };
+  }
+
+  /* ----- Halaman utama ----- */
+  function viewMain(){
+    const tabs = [["paket", "Paket Wisata"], ["dok", "Dokumentasi"], ["set", "Pengaturan"]];
+    return `<div class="tabs">${tabs.map(([k, l]) => `<button class="tab${tab === k ? " on" : ""}" data-tab="${k}">${l}</button>`).join("")}</div>` +
+      (tab === "paket" ? viewPaket() : tab === "dok" ? viewDok() : viewSet());
+  }
+  function bindMain(){
+    document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); });
+    if (tab === "paket") bindPaket(); else if (tab === "dok") bindDok(); else bindSet();
+  }
+
+  function viewPaket(){
+    const list = allPackages();
+    return `<div class="top-actions"><button class="btn" id="addPkg">+ Tambah paket baru</button>
+      <span class="muted">${list.filter(x => x.status !== "hidden").length} paket tampil di website</span></div>
+      <div class="grid">${list.map(x => {
+        const p = x.pkg, im = imgSrc(p.image);
+        return `<div class="pc${x.status === "hidden" ? " hid" : ""}">
+          <div class="th" style="${im ? `background-image:url('${esc(im)}'),linear-gradient(135deg,#14246b,#213a9a)` : ""}"><span class="badge ${x.status}">${STATUS_LABEL[x.status]}</span></div>
+          <div class="bd">
+            <h3>${esc(p.name)}</h3>
+            <div class="muted">${esc(p.days)} hari ${esc(p.nights)} malam · ${esc(p.type)}</div>
+            <div><b style="color:var(--red)">${p.price ? rp(p.price) : "Hubungi kami"}</b></div>
+            <div class="acts">
+              ${x.status === "hidden"
+                ? `<button class="btn o s" data-act="show" data-slug="${esc(x.slug)}">Tampilkan lagi</button>`
+                : `<button class="btn o s" data-act="edit" data-slug="${esc(x.slug)}">Ubah</button>
+                   ${x.status === "new" ? `<button class="btn d s" data-act="del" data-slug="${esc(x.slug)}">Hapus</button>` : `<button class="btn d s" data-act="hide" data-slug="${esc(x.slug)}">Sembunyikan</button>`}
+                   ${x.status === "changed" ? `<button class="btn g s" data-act="revert" data-slug="${esc(x.slug)}">Kembalikan ke asli</button>` : ""}
+                   <a class="btn g s" href="/detail?p=${encodeURIComponent(x.slug)}" target="_blank" rel="noopener">Lihat</a>`}
+            </div></div></div>`;
+      }).join("")}</div>`;
+  }
+  function bindPaket(){
+    $("#addPkg").onclick = () => openForm(null);
+    document.querySelectorAll("[data-act]").forEach(b => b.onclick = () => {
+      const slug = b.dataset.slug, a = b.dataset.act, item = allPackages().find(x => x.slug === slug);
+      if (a === "edit") return openForm(item);
+      if (a === "del") { if (!confirm("Hapus paket ini dari website?")) return; data.packages = data.packages.filter(p => p.slug !== slug); }
+      if (a === "hide") { if (!confirm("Sembunyikan paket ini dari website? Bisa ditampilkan lagi kapan saja.")) return; if (!data.hidden.includes(slug)) data.hidden.push(slug); }
+      if (a === "show") data.hidden = data.hidden.filter(s => s !== slug);
+      if (a === "revert") { if (!confirm("Kembalikan paket ini ke versi aslinya? Perubahan Anda akan hilang.")) return; data.packages = data.packages.filter(p => p.slug !== slug); }
+      dirty = true; render();
+    });
+  }
+
+  /* ----- Dokumentasi ----- */
+  function viewDok(){
+    return `<div class="box"><h2>Tambah foto dokumentasi</h2>
+      <p class="muted">Pilih satu atau banyak foto. Foto otomatis dikecilkan supaya website tetap cepat.</p>
+      <input type="file" id="dokFiles" accept="image/*" multiple>
+      ${docDraft.length ? `<div class="grid" style="margin-top:16px">${docDraft.map((d, i) => `
+        <div class="doc"><img src="${d.url}" alt="">
+          <div class="bd"><input type="text" data-dcap="${i}" placeholder="Keterangan foto" value="${esc(d.cap)}">
+          <select data-dcat="${i}" style="margin-top:8px">${DOC_CATS.map(c => `<option${c === d.cat ? " selected" : ""}>${c}</option>`).join("")}</select>
+          <button class="btn d s" data-drm="${i}" style="margin-top:8px">Buang</button></div></div>`).join("")}</div>
+        <p style="margin-top:16px"><button class="btn" id="dokAdd">Tambahkan ${docDraft.length} foto</button></p>` : ""}
+    </div>
+    <div class="box"><h2>Foto yang sudah ditambah lewat panel</h2>
+      ${data.docs.length ? `<div class="grid">${data.docs.map((d, i) => `
+        <div class="doc"><img src="${esc(imgSrc(d.src))}" alt="">
+          <div class="bd"><input type="text" data-ecap="${i}" value="${esc(d.cap)}" placeholder="Keterangan foto">
+          <select data-ecat="${i}" style="margin-top:8px">${[...new Set([...DOC_CATS, d.cat].filter(Boolean))].map(c => `<option${c === d.cat ? " selected" : ""}>${esc(c)}</option>`).join("")}</select>
+          <button class="btn d s" data-edel="${i}" style="margin-top:8px">Hapus</button></div></div>`).join("")}</div>`
+        : `<p class="muted">Belum ada. Foto dokumentasi yang sudah ada di website tetap tampil seperti biasa.</p>`}
+    </div>`;
+  }
+  function bindDok(){
+    $("#dokFiles").onchange = async e => {
+      const files = [...e.target.files]; if (!files.length) return;
+      toast("Memproses foto...");
+      for (const f of files) {
+        try { docDraft.push({ url: await resizeImage(f, 1600, 0.85), cap: f.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " "), cat: "Malaysia" }); }
+        catch (err) { toast(err.message, true); }
+      }
+      render();
+    };
+    document.querySelectorAll("[data-dcap]").forEach(i => i.oninput = () => docDraft[i.dataset.dcap].cap = i.value);
+    document.querySelectorAll("[data-dcat]").forEach(i => i.onchange = () => docDraft[i.dataset.dcat].cat = i.value);
+    document.querySelectorAll("[data-drm]").forEach(b => b.onclick = () => { docDraft.splice(+b.dataset.drm, 1); render(); });
+    const add = $("#dokAdd");
+    if (add) add.onclick = () => {
+      docDraft.forEach((d, i) => {
+        const path = `img/dok-${Date.now()}-${i}.jpg`;
+        pending[path] = b64Of(d.url); pendingUrl[path] = d.url;
+        data.docs.push({ src: "/" + path, cap: d.cap.trim(), cat: d.cat });
+      });
+      docDraft = []; dirty = true; render();
+    };
+    document.querySelectorAll("[data-ecap]").forEach(i => i.oninput = () => { data.docs[i.dataset.ecap].cap = i.value; dirty = true; });
+    document.querySelectorAll("[data-ecat]").forEach(i => i.onchange = () => { data.docs[i.dataset.ecat].cat = i.value; dirty = true; });
+    document.querySelectorAll("[data-edel]").forEach(b => b.onclick = () => {
+      if (!confirm("Hapus foto ini dari dokumentasi?")) return;
+      data.docs.splice(+b.dataset.edel, 1); dirty = true; render();
+    });
+    // pastikan tombol terbitkan muncul setelah mengetik keterangan
+    document.querySelectorAll("[data-ecap],[data-ecat]").forEach(i => i.addEventListener("input", updateBar));
+    document.querySelectorAll("[data-ecat]").forEach(i => i.addEventListener("change", updateBar));
+  }
+
+  /* ----- Pengaturan ----- */
+  function viewSet(){
+    return `<div class="box"><h2>Pengaturan</h2>
+      <p>Terhubung ke <b>${esc(cfg.owner)}/${esc(cfg.repo)}</b> (branch ${esc(cfg.branch || "main")}).</p>
+      <p><button class="btn o" id="reload">Muat ulang data dari GitHub</button> <button class="btn d" id="logout">Keluar dan hapus token</button></p>
+      <p class="hint">Muat ulang akan membuang perubahan yang belum diterbitkan.</p></div>
+    <div class="box"><h2>Cara kerja singkat</h2>
+      <ol class="steps"><li>Tambah atau ubah paket, atau tambah foto.</li><li>Tekan <b>Terbitkan ke Website</b> di bagian bawah layar.</li><li>Tunggu 1 sampai 3 menit sampai GitHub Pages selesai memperbarui website.</li></ol>
+      <p class="hint">Paket bawaan (yang sudah ada sebelum panel ini) bisa diubah atau disembunyikan, dan bisa dikembalikan ke aslinya kapan saja.</p></div>`;
+  }
+  function bindSet(){
+    $("#reload").onclick = () => { if (!dirty || confirm("Ada perubahan yang belum diterbitkan. Tetap muat ulang?")) loadData(); };
+    $("#logout").onclick = () => { if (dirty && !confirm("Ada perubahan yang belum diterbitkan. Tetap keluar?")) return; dirty = false; cfg = { owner: cfg.owner, repo: cfg.repo, branch: cfg.branch }; saveCfg(); render(); };
+  }
+
+  /* ----- Formulir paket ----- */
+  function openForm(item){
+    const base = item ? clone(item.pkg) : { name: "", dest: "", type: "", days: "", nights: "", price: null, tag: "", items: [], schedule: [], itinerary: [], included: [], excluded: [], costs: [], terms: [], bonus: [] };
+    editing = {
+      isNew: !item, builtin: item && item.status !== "new", slug: base.slug || "",
+      p: base,
+      mode: base.daily ? "daily" : (base.departures && base.departures.length) ? "dates" : "none",
+      deps: clone(base.departures || []),
+      daily: base.daily ? base.daily.slice() : ["", ""],
+      itin: (base.itinerary || []).map(d => ({ t: d[0] || "", x: d[1] || "", h: d[2] || "" })),
+      img: null
+    };
+    window.scrollTo(0, 0); render();
+  }
+
+  function viewForm(){
+    const e = editing, p = e.p;
+    const dests = [...new Set(allPackages().map(x => x.pkg.dest))];
+    const copyOpts = allPackages().map(x => `<option value="${esc(x.slug)}">${esc(x.pkg.name)}</option>`).join("");
+    const im = e.img ? e.img.url : imgSrc(p.image);
+    return `<div class="top-actions" style="margin-top:20px"><button class="btn g" id="fBack">&larr; Kembali</button>
+      <h1 style="margin:0">${e.isNew ? "Tambah paket baru" : "Ubah paket"}</h1></div>
+    <div id="fErr"></div>
+
+    <div class="box"><h2>1. Informasi dasar</h2>
+      <label for="fName">Nama paket</label><input id="fName" type="text" value="${esc(p.name)}" placeholder="Contoh: Tour Bangkok Pattaya 5D4N">
+      <div class="row">
+        <div><label for="fDest">Tujuan <small>(nama negara/kota, dipisah spasi)</small></label><input id="fDest" type="text" list="dlDest" value="${esc(p.dest)}" placeholder="Malaysia Singapore Thailand"></div>
+        <div><label for="fType">Jenis rute</label><input id="fType" type="text" list="dlType" value="${esc(p.type)}" placeholder="3 Negara / 2 Negara / Thailand"></div>
+      </div>
+      <div class="row">
+        <div><label for="fDays">Jumlah hari</label><input id="fDays" type="number" min="1" value="${esc(p.days)}"></div>
+        <div><label for="fNights">Jumlah malam</label><input id="fNights" type="number" min="0" value="${esc(p.nights)}"></div>
+        <div><label for="fPrice">Harga mulai dari <small>(angka saja, kosongkan = "Hubungi kami")</small></label><input id="fPrice" type="text" inputmode="numeric" value="${esc(p.price || "")}" placeholder="6990000"></div>
+        <div><label for="fTag">Label di kartu <small>(opsional, misal Promo)</small></label><input id="fTag" type="text" value="${esc(p.tag || "")}"></div>
+      </div>
+      <div class="seg"><label><input type="checkbox" id="fFeat"${p.featured ? " checked" : ""}> Jadikan paket unggulan (tampil paling awal)</label></div>
+      <label for="fImg">Gambar / brosur paket</label>
+      <input id="fImg" type="file" accept="image/*">
+      ${im ? `<img class="imgprev" id="fPrev" src="${esc(im)}" alt="">` : `<img class="imgprev" id="fPrev" style="display:none" alt="">`}
+      <p class="hint">Gambar ini tampil di kartu paket dan di halaman detail. Boleh brosur atau flyer.</p>
+      <label for="fItems">Poin singkat di kartu <small>(satu poin per baris, 2 sampai 4 poin)</small></label>
+      <textarea id="fItems" placeholder="Bangkok dan Pattaya&#10;Berangkat setiap hari">${esc((p.items || []).join("\n"))}</textarea>
+    </div>
+
+    <div class="box"><h2>2. Jadwal keberangkatan</h2>
+      <div class="seg">
+        <label><input type="radio" name="fMode" value="dates"${e.mode === "dates" ? " checked" : ""}> Tanggal tertentu</label>
+        <label><input type="radio" name="fMode" value="daily"${e.mode === "daily" ? " checked" : ""}> Berangkat setiap hari</label>
+        <label><input type="radio" name="fMode" value="none"${e.mode === "none" ? " checked" : ""}> Tidak ada tanggal</label>
+      </div>
+      <div id="modeBody"></div>
+      <label for="fSched">Keterangan jadwal <small>(satu poin per baris)</small></label>
+      <textarea id="fSched" placeholder="Keberangkatan mingguan, setiap Rabu&#10;Meeting point: Bandara KLIA">${esc((p.schedule || []).join("\n"))}</textarea>
+    </div>
+
+    <div class="box"><h2>3. Itinerary</h2>
+      <p class="muted" style="margin-top:0">Satu kotak untuk satu hari. Judul contoh: <code>DAY 1 : BANGKOK (No Meal)</code></p>
+      <div id="itin"></div>
+      <button class="btn o s" id="addDay" type="button">+ Tambah hari</button>
+    </div>
+
+    <div class="box"><h2>4. Fasilitas, biaya, dan syarat</h2>
+      <div class="row" style="align-items:end"><div><label for="fCopy">Salin dari paket lain <small>(menghemat waktu, lalu bisa diedit)</small></label>
+        <select id="fCopy"><option value="">Pilih paket...</option>${copyOpts}</select></div>
+        <div><button class="btn g" id="fCopyGo" type="button">Salin isian di bawah</button></div></div>
+      <div class="row">
+        <div><label for="fInc">Termasuk <small>(satu per baris)</small></label><textarea id="fInc">${esc((p.included || []).join("\n"))}</textarea></div>
+        <div><label for="fExc">Tidak termasuk <small>(satu per baris)</small></label><textarea id="fExc">${esc((p.excluded || []).join("\n"))}</textarea></div>
+      </div>
+      <label for="fBonus">Bonus <small>(opsional, satu per baris)</small></label><textarea id="fBonus">${esc((p.bonus || []).join("\n"))}</textarea>
+      <label for="fCosts">Biaya tambahan dan pembayaran <small>(satu per baris)</small></label><textarea id="fCosts">${esc((p.costs || []).join("\n"))}</textarea>
+      <label for="fTerms">Syarat dan ketentuan <small>(satu poin per baris)</small></label><textarea id="fTerms" style="min-height:160px">${esc((p.terms || []).join("\n"))}</textarea>
+    </div>
+
+    <div class="top-actions"><button class="btn" id="fSave">Simpan paket</button> <button class="btn g" id="fCancel">Batal</button>
+      <span class="muted">Setelah disimpan, tekan Terbitkan ke Website di halaman daftar.</span></div>`;
+  }
+
+  function syncItin(){
+    document.querySelectorAll("[data-it]").forEach(el => { const [i, k] = el.dataset.it.split("."); if (editing.itin[i]) editing.itin[i][k] = el.value; });
+  }
+  function renderItin(){
+    const box = $("#itin");
+    box.innerHTML = editing.itin.map((d, i) => `<div class="day">
+      <div class="dh"><b>Hari ${i + 1}</b><button class="btn d s" type="button" data-rmday="${i}">Hapus hari</button></div>
+      <label>Judul hari</label><input type="text" data-it="${i}.t" value="${esc(d.t)}" placeholder="DAY ${i + 1} : ">
+      <label>Isi kegiatan</label><textarea data-it="${i}.x">${esc(d.x)}</textarea>
+      <label>Hotel <small>(opsional)</small></label><input type="text" data-it="${i}.h" value="${esc(d.h)}" placeholder="Nama hotel / setaraf *3 Kota">
+    </div>`).join("") || `<p class="muted">Belum ada hari. Tekan "Tambah hari".</p>`;
+    box.querySelectorAll("[data-rmday]").forEach(b => b.onclick = () => { syncItin(); editing.itin.splice(+b.dataset.rmday, 1); renderItin(); });
+  }
+
+  const fmtDate = iso => { const [y, m, d] = iso.split("-").map(Number); return new Date(y, m - 1, d).toLocaleDateString("id-ID", { weekday: "short", day: "numeric", month: "short", year: "numeric" }); };
+  function renderMode(){
+    const e = editing, box = $("#modeBody");
+    if (e.mode === "none") { box.innerHTML = ""; return; }
+    if (e.mode === "daily") {
+      box.innerHTML = `<div class="row"><div><label for="dFrom">Mulai tanggal</label><input id="dFrom" type="date" value="${esc(e.daily[0])}"></div>
+        <div><label for="dTo">Sampai tanggal</label><input id="dTo" type="date" value="${esc(e.daily[1])}"></div></div>
+        <p class="hint">Pelanggan bebas memilih tanggal di dalam periode ini.</p>`;
+      $("#dFrom").onchange = ev => e.daily[0] = ev.target.value; $("#dTo").onchange = ev => e.daily[1] = ev.target.value;
+      return;
+    }
+    const sorted = e.deps.slice().sort((a, b) => a.replace("*", "").localeCompare(b.replace("*", "")));
+    box.innerHTML = `<div class="row" style="align-items:end">
+        <div><label for="dOne">Tambah satu tanggal</label><input id="dOne" type="date"></div>
+        <div><label style="display:flex;gap:8px;align-items:center;margin:0 0 10px"><input type="checkbox" id="dPeak" style="width:auto"> High season (tampil merah)</label>
+          <button class="btn o s" type="button" id="dAdd">Tambah</button></div>
+      </div>
+      <div class="row" style="align-items:end;margin-top:6px">
+        <div><label for="dRepFrom">Atau ulangi tiap minggu, mulai</label><input id="dRepFrom" type="date"></div>
+        <div><label for="dRepTo">sampai</label><input id="dRepTo" type="date"></div>
+        <div><button class="btn o s" type="button" id="dRep">Tambah tiap minggu</button></div>
+      </div>
+      <p class="hint">Contoh: mulai Rabu 4 Nov sampai 30 Des akan menambah semua hari Rabu di antaranya.</p>
+      <div class="chips">${sorted.map(s => { const pk = s.endsWith("*"); return `<span class="chip${pk ? " pk" : ""}">${fmtDate(s.replace("*", ""))}${pk ? " (high season)" : ""}<button type="button" data-rmdep="${esc(s)}" aria-label="Hapus">&times;</button></span>`; }).join("") || `<span class="muted">Belum ada tanggal.</span>`}</div>`;
+    $("#dAdd").onclick = () => { const v = $("#dOne").value; if (!v) return toast("Pilih tanggalnya dulu ya.", true); addDep(v, $("#dPeak").checked); };
+    $("#dRep").onclick = () => {
+      const a = $("#dRepFrom").value, b = $("#dRepTo").value, pk = $("#dPeak").checked;
+      if (!a || !b || b < a) return toast("Isi tanggal mulai dan sampai dengan benar.", true);
+      const d = new Date(a + "T00:00:00"), end = new Date(b + "T00:00:00"); let n = 0;
+      while (d <= end && n < 200) { addDep(isoOf(d), pk, true); d.setDate(d.getDate() + 7); n++; }
+      renderMode();
+    };
+    box.querySelectorAll("[data-rmdep]").forEach(b => b.onclick = () => { e.deps = e.deps.filter(x => x !== b.dataset.rmdep); renderMode(); });
+  }
+  function addDep(iso, peak, quiet){
+    const e = editing; e.deps = e.deps.filter(x => x.replace("*", "") !== iso);
+    e.deps.push(iso + (peak ? "*" : "")); if (!quiet) renderMode();
+  }
+
+  function bindForm(){
+    const e = editing;
+    $("#dlDest").innerHTML = [...new Set(allPackages().map(x => x.pkg.dest))].map(d => `<option value="${esc(d)}">`).join("");
+    renderMode(); renderItin();
+    document.querySelectorAll('input[name="fMode"]').forEach(r => r.onchange = () => { e.mode = r.value; renderMode(); });
+    $("#addDay").onclick = () => { syncItin(); e.itin.push({ t: `DAY ${e.itin.length + 1} : `, x: "", h: "" }); renderItin(); };
+    $("#fBack").onclick = $("#fCancel").onclick = () => { if (confirm("Tutup formulir tanpa menyimpan?")) { editing = null; render(); } };
+    $("#fImg").onchange = async ev => {
+      const f = ev.target.files[0]; if (!f) return;
+      try {
+        const url = await resizeImage(f, 2000, 0.9);
+        e.img = { url }; const pv = $("#fPrev"); pv.src = url; pv.style.display = "block";
+      } catch (err) { toast(err.message, true); }
+    };
+    $("#fCopyGo").onclick = () => {
+      const s = $("#fCopy").value; if (!s) return toast("Pilih paket sumber dulu ya.", true);
+      const src = allPackages().find(x => x.slug === s).pkg;
+      if (!confirm("Isian Termasuk, Tidak termasuk, Bonus, Biaya, dan Syarat akan diganti dengan milik paket itu. Lanjut?")) return;
+      $("#fInc").value = (src.included || []).join("\n"); $("#fExc").value = (src.excluded || []).join("\n");
+      $("#fBonus").value = (src.bonus || []).join("\n"); $("#fCosts").value = (src.costs || []).join("\n"); $("#fTerms").value = (src.terms || []).join("\n");
+      toast("Isian disalin. Silakan sesuaikan seperlunya.");
+    };
+    $("#fSave").onclick = saveForm;
+  }
+
+  function slugify(s){ return String(s).toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "paket"; }
+
+  function saveForm(){
+    syncItin();
+    const e = editing, v = id => $(id).value.trim(), problems = [];
+    const name = v("#fName"), days = parseInt(v("#fDays"), 10), nights = parseInt(v("#fNights"), 10);
+    const price = parseInt(v("#fPrice").replace(/\D/g, ""), 10) || null;
+    if (!name) problems.push("Nama paket belum diisi.");
+    if (!v("#fDest")) problems.push("Tujuan belum diisi.");
+    if (!v("#fType")) problems.push("Jenis rute belum diisi.");
+    if (!(days > 0)) problems.push("Jumlah hari harus angka lebih dari 0.");
+    if (!(nights >= 0)) problems.push("Jumlah malam harus berupa angka.");
+    const items = lines($("#fItems").value);
+    if (!items.length) problems.push("Isi minimal satu poin singkat untuk kartu.");
+    if (e.mode === "daily" && (!e.daily[0] || !e.daily[1] || e.daily[1] < e.daily[0])) problems.push("Periode berangkat setiap hari belum benar.");
+    if (e.mode === "dates" && !e.deps.length) problems.push("Belum ada tanggal keberangkatan. Tambah tanggal atau pilih mode lain.");
+    if (!e.p.image && !e.img) problems.push("Pilih gambar/brosur paket.");
+    const days_ = e.itin.filter(d => d.t.trim() || d.x.trim());
+    if (days_.some(d => !d.t.trim() || !d.x.trim())) problems.push("Ada hari itinerary yang judul atau isinya masih kosong.");
+    if (problems.length) {
+      $("#fErr").innerHTML = `<div class="err"><b>Mohon dilengkapi:</b><ul style="margin:6px 0 0;padding-left:20px">${problems.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+      window.scrollTo(0, 0); return;
+    }
+
+    let slug = e.slug;
+    if (e.isNew) {
+      const taken = new Set(allPackages().map(x => x.slug)); slug = slugify(name);
+      let n = 2, s0 = slug; while (taken.has(slug)) slug = s0 + "-" + n++;
+    }
+    const pkg = {
+      slug, name, dest: v("#fDest"), type: v("#fType"), days, nights,
+      color: e.p.color || COLORS[allPackages().length % COLORS.length],
+      price, tag: v("#fTag"), image: e.p.image || "", items
+    };
+    if ($("#fFeat").checked) pkg.featured = true;
+    if (e.img) {
+      const path = `img/${slug}-${Date.now()}.jpg`;
+      pending[path] = b64Of(e.img.url); pendingUrl[path] = e.img.url; pkg.image = "/" + path;
+    }
+    const sched = lines($("#fSched").value); if (sched.length) pkg.schedule = sched;
+    if (e.mode === "dates") pkg.departures = e.deps.slice().sort((a, b) => a.replace("*", "").localeCompare(b.replace("*", "")));
+    if (e.mode === "daily") pkg.daily = e.daily.slice();
+    const bonus = lines($("#fBonus").value); if (bonus.length) pkg.bonus = bonus;
+    if (days_.length) pkg.itinerary = days_.map(d => [d.t.trim(), d.x.trim(), d.h.trim()]);
+    pkg.included = lines($("#fInc").value); pkg.excluded = lines($("#fExc").value);
+    pkg.costs = lines($("#fCosts").value); pkg.terms = lines($("#fTerms").value);
+
+    const i = data.packages.findIndex(p => p.slug === slug);
+    if (i > -1) data.packages[i] = pkg; else data.packages.push(pkg);
+    data.hidden = data.hidden.filter(s => s !== slug);
+    dirty = true; editing = null; tab = "paket"; render();
+    toast("Paket disimpan. Tekan Terbitkan ke Website agar tampil di website.");
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- Mulai ---------- */
+  document.addEventListener("DOMContentLoaded", () => { cfg.token ? loadData() : render(); });
+})();
+</script>
+</body>
+</html>
