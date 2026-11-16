@@ -270,7 +270,7 @@ const findPackage = slug => PACKAGES.find(p => p.slug === slug);
 
 const NAV = [
   ["home",     "beranda",         "Beranda"],
-  ["paket",    "/paket wisata",         "Paket Wisata"],
+  ["paket",    "/paket.wisata",         "Paket Wisata"],
   ["layanan",  "/layanan",       "Layanan"],
   ["dokumentasi", "/dokumentasi", "Dokumentasi"],
   ["kontak",   "/kontak",        "Kontak"]
@@ -312,7 +312,7 @@ function renderHeader(active){
   return `
   <header>
     <div class="wrap nav">
-      <a href="index.html" class="brand" aria-label="${SITE.name}">
+      <a href="beranda" class="brand" aria-label="${SITE.name}">
         <img src="logo.jpg" alt="Logo TravelKita" width="122" height="50">
       </a>
       <nav id="menu" aria-label="Menu utama"><ul>${links}</ul></nav>
@@ -328,7 +328,7 @@ function renderFooter(){
     <div class="wrap">
       <div class="foot-grid">
         <div>
-          <a class="foot-brand" href="index.html"><img src="logo.jpg" alt="${SITE.name}" width="112" height="46"></a>
+          <a class="foot-brand" href="beranda"><img src="logo.jpg" alt="${SITE.name}" width="112" height="46"></a>
           <p>Paket wisata, tiket pesawat, dan sewa bus untuk perjalanan yang nyaman.</p>
         </div>
         <div>
