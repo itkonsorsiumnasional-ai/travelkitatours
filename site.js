@@ -270,7 +270,7 @@ const findPackage = slug => PACKAGES.find(p => p.slug === slug);
 
 const NAV = [
   ["home",     "beranda",         "Beranda"],
-  ["paket",    "/paket-wisata",         "Paket Wisata"],
+  ["paket",    "/paket",         "Paket Wisata"],
   ["layanan",  "/layanan",       "Layanan"],
   ["dokumentasi", "/dokumentasi", "Dokumentasi"],
   ["kontak",   "/kontak",        "Kontak"]
