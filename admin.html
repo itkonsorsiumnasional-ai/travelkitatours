@@ -309,18 +309,18 @@
 
   /* ----- Halaman utama ----- */
   function viewMain(){
-    const tabs = [["paket", "Paket Wisata"], ["dok", "Dokumentasi"], ["set", "Pengaturan"]];
+    const tabs = [["paket", "Paket Wisata"], ["imp", "Impor / Ekspor JSON"], ["dok", "Dokumentasi"], ["set", "Pengaturan"]];
     return `<div class="tabs">${tabs.map(([k, l]) => `<button class="tab${tab === k ? " on" : ""}" data-tab="${k}">${l}</button>`).join("")}</div>` +
-      (tab === "paket" ? viewPaket() : tab === "dok" ? viewDok() : viewSet());
+      (tab === "paket" ? viewPaket() : tab === "imp" ? viewImp() : tab === "dok" ? viewDok() : viewSet());
   }
   function bindMain(){
     document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => { tab = b.dataset.tab; render(); });
-    if (tab === "paket") bindPaket(); else if (tab === "dok") bindDok(); else bindSet();
+    if (tab === "paket") bindPaket(); else if (tab === "imp") bindImp(); else if (tab === "dok") bindDok(); else bindSet();
   }
 
   function viewPaket(){
     const list = allPackages();
-    return `<div class="top-actions"><button class="btn" id="addPkg">+ Tambah paket baru</button>
+    return `<div class="top-actions"><button class="btn" id="addPkg">+ Tambah paket baru</button> <button class="btn o" id="goImp">Impor dari JSON</button>
       <span class="muted">${list.filter(x => x.status !== "hidden").length} paket tampil di website</span></div>
       <div class="grid">${list.map(x => {
         const p = x.pkg, im = imgSrc(p.image);
@@ -342,6 +342,7 @@
   }
   function bindPaket(){
     $("#addPkg").onclick = () => openForm(null);
+    $("#goImp").onclick = () => { tab = "imp"; render(); };
     document.querySelectorAll("[data-act]").forEach(b => b.onclick = () => {
       const slug = b.dataset.slug, a = b.dataset.act, item = allPackages().find(x => x.slug === slug);
       if (a === "edit") return openForm(item);
@@ -405,6 +406,267 @@
     // pastikan tombol terbitkan muncul setelah mengetik keterangan
     document.querySelectorAll("[data-ecap],[data-ecat]").forEach(i => i.addEventListener("input", updateBar));
     document.querySelectorAll("[data-ecat]").forEach(i => i.addEventListener("change", updateBar));
+  }
+
+  /* ----- Impor / Ekspor JSON ----- */
+  const SAMPLE = {
+    packages: [{
+      name: "Tour Vietnam 5D4N",
+      dest: "Vietnam",
+      type: "1 Negara",
+      days: 5,
+      nights: 4,
+      price: 7250000,
+      tag: "Baru",
+      image: "/img/tour-vietnam.jpg",
+      items: ["Hanoi dan Halong Bay", "Berangkat tiap Rabu"],
+      schedule: ["Keberangkatan mingguan, setiap Rabu", "Meeting point: Bandara Noi Bai, Hanoi"],
+      departures: ["2026-12-02", "2026-12-09", "2026-12-25*"],
+      bonus: ["Free city tour Hanoi"],
+      itinerary: [
+        ["DAY 1 : HANOI (No Meal)", "Tiba di Hanoi, check in hotel.", "Hotel A / setaraf *3 Hanoi"],
+        ["DAY 2 : HALONG BAY (B,L,D)", "Wisata kapal di Halong Bay.", ""]
+      ],
+      included: ["Tiket pesawat pulang pergi", "Hotel bintang 3 setaraf"],
+      excluded: ["Tips guide dan driver", "Biaya pribadi"],
+      costs: ["DP Rp 3.000.000 per orang. Pelunasan 20 hari sebelum berangkat."],
+      terms: ["Paspor berlaku minimal 6 bulan.", "Pembayaran tidak dapat dikembalikan."]
+    }]
+  };
+  let impText = "", impPreview = null, impErr = "", impMode = "merge", impScope = "all";
+
+  const pick = (o, keys) => { for (const k of keys) if (o && o[k] !== undefined && o[k] !== null && o[k] !== "") return o[k]; return undefined; };
+  const asList = v => Array.isArray(v) ? v.map(x => String(x).trim()).filter(Boolean) : (typeof v === "string" ? lines(v) : []);
+
+  function normDate(x){
+    let s = "", peak = false;
+    if (x && typeof x === "object") { s = String(pick(x, ["date", "tanggal"]) || ""); peak = !!pick(x, ["peak", "highSeason", "high_season"]); }
+    else s = String(x || "");
+    s = s.trim(); if (s.endsWith("*")) { peak = true; s = s.slice(0, -1).trim(); }
+    let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (!m) { const n = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/); if (n) m = [0, n[3], n[2], n[1]]; }
+    if (!m) return null;
+    const y = +m[1], mo = +m[2], d = +m[3], dt = new Date(y, mo - 1, d);
+    if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+    return `${y}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}` + (peak ? "*" : "");
+  }
+
+  function normPkg(raw, i){
+    const errs = [], warns = [];
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return { errs: ["Bukan data paket yang valid."], warns, pkg: null };
+    const name = String(pick(raw, ["name", "nama", "title", "judul"]) || "").trim();
+    if (!name) errs.push("Nama paket kosong.");
+    const dm = name.match(/(\d+)\s*D\s*(\d+)\s*N/i);
+    let days = parseInt(pick(raw, ["days", "hari"]), 10), nights = parseInt(pick(raw, ["nights", "malam"]), 10);
+    if (!(days > 0) && dm) days = +dm[1];
+    if (!(days > 0)) errs.push("Jumlah hari tidak ada.");
+    if (!(nights >= 0) && dm) nights = +dm[2];
+    if (!(nights >= 0) && days > 0) { nights = days - 1; warns.push("Jumlah malam dihitung otomatis."); }
+    const dest = String(pick(raw, ["dest", "tujuan", "destination"]) || "").trim();
+    if (!dest) errs.push("Tujuan kosong.");
+    let type = String(pick(raw, ["type", "rute", "jenis"]) || "").trim();
+    if (!type && dest) { type = dest; warns.push("Jenis rute kosong, memakai nama tujuan."); }
+    if (errs.length) return { errs, warns, pkg: null };
+
+    const pr = pick(raw, ["price", "harga"]);
+    const price = pr === undefined ? null : (parseInt(String(pr).replace(/\D/g, ""), 10) || null);
+    let items = asList(pick(raw, ["items", "poin"]));
+    if (!items.length) { items = [dest, `${days} hari ${nights} malam`]; warns.push("Poin singkat kosong, dibuat otomatis."); }
+
+    const pkg = {
+      slug: slugify(String(pick(raw, ["slug"]) || name)), name, dest, type, days, nights,
+      color: /^#[0-9a-f]{3,8},#[0-9a-f]{3,8}$/i.test(String(raw.color || "")) ? raw.color : COLORS[i % COLORS.length],
+      price, tag: String(pick(raw, ["tag", "label"]) || "").trim(), image: "", items
+    };
+    let imageData = null;
+    const im = String(pick(raw, ["image", "gambar"]) || "").trim();
+    if (/^data:image\/(png|jpe?g|webp);base64,/i.test(im)) imageData = im; else pkg.image = im;
+    if (!im) warns.push("Tanpa gambar. Tambahkan lewat tombol Ubah setelah diimpor.");
+    if (pick(raw, ["featured", "unggulan"])) pkg.featured = true;
+    const sched = asList(pick(raw, ["schedule", "jadwal"])); if (sched.length) pkg.schedule = sched;
+
+    const depRaw = pick(raw, ["departures", "keberangkatan", "tanggal"]);
+    if (Array.isArray(depRaw)) {
+      const seen = new Set(), out = []; let bad = 0;
+      depRaw.forEach(x => { const d = normDate(x); if (!d) { bad++; return; } const k = d.replace("*", ""); if (!seen.has(k)) { seen.add(k); out.push(d); } });
+      if (bad) warns.push(`${bad} tanggal dilewati karena formatnya tidak dikenali (pakai 2026-12-02 atau 02/12/2026).`);
+      if (out.length) pkg.departures = out.sort((a, b) => a.replace("*", "").localeCompare(b.replace("*", "")));
+    }
+    const dl = pick(raw, ["daily", "setiapHari", "setiap_hari"]);
+    if (dl && !pkg.departures) {
+      const a = Array.isArray(dl) ? dl : [pick(dl, ["from", "mulai"]), pick(dl, ["to", "sampai"])];
+      const f = normDate(a[0]), t = normDate(a[1]);
+      if (f && t && f.replace("*", "") <= t.replace("*", "")) pkg.daily = [f.replace("*", ""), t.replace("*", "")];
+      else warns.push("Periode berangkat setiap hari tidak valid, dilewati.");
+    }
+    const bonus = asList(pick(raw, ["bonus"])); if (bonus.length) pkg.bonus = bonus;
+
+    const itRaw = pick(raw, ["itinerary"]);
+    if (Array.isArray(itRaw)) {
+      let bad = 0;
+      const it = itRaw.map(d => Array.isArray(d)
+        ? [d[0], d[1], d[2]]
+        : [pick(d, ["title", "judul", "t"]), pick(d, ["text", "isi", "kegiatan", "x"]), pick(d, ["hotel", "h"])])
+        .map(d => [String(d[0] || "").trim(), String(d[1] || "").trim(), String(d[2] || "").trim()])
+        .filter(d => { if (d[0] && d[1]) return true; bad++; return false; });
+      if (bad) warns.push(`${bad} hari itinerary dilewati karena judul atau isinya kosong.`);
+      if (it.length) pkg.itinerary = it;
+    }
+    pkg.included = asList(pick(raw, ["included", "termasuk"]));
+    pkg.excluded = asList(pick(raw, ["excluded", "tidakTermasuk", "tidak_termasuk"]));
+    pkg.costs = asList(pick(raw, ["costs", "biaya"]));
+    pkg.terms = asList(pick(raw, ["terms", "syarat"]));
+    if (!pkg.included.length && !pkg.terms.length) warns.push("Fasilitas dan syarat kosong. Bisa dilengkapi lewat Ubah.");
+    return { errs, warns, pkg, imageData };
+  }
+
+  function parseImport(){
+    impErr = ""; impPreview = null;
+    let t = impText.trim().replace(/^\uFEFF/, "");
+    const fm = t.match(/```(?:json)?\s*([\s\S]*?)```/i);          // JSON di dalam pagar kode ```
+    if (fm) t = fm[1].trim();
+    else {                                                        // buang teks pengantar sebelum/sesudah JSON
+      const a = t.search(/[\[{]/), z = Math.max(t.lastIndexOf("}"), t.lastIndexOf("]"));
+      if (a > -1 && z > a) t = t.slice(a, z + 1);
+    }
+    if (!t) { impErr = "Tempel kode JSON atau pilih file dulu ya."; return; }
+    let j; try { j = JSON.parse(t); } catch (e) { impErr = "Kode JSON tidak valid: " + e.message + ". Cek tanda koma, kurung, dan tanda kutip."; return; }
+    let list = null, docs = null;
+    if (Array.isArray(j)) list = j;
+    else if (j && typeof j === "object") {
+      const arr = pick(j, ["packages", "paket", "data"]);
+      if (Array.isArray(arr)) { list = arr; if (Array.isArray(j.docs)) docs = j.docs; }
+      else if (pick(j, ["name", "nama"])) list = [j];
+    }
+    if (!list || !list.length) { impErr = "Tidak ada paket yang terbaca. Isinya harus daftar paket (lihat contoh format di bawah)."; return; }
+    const all = allPackages(), existing = new Set(all.map(x => x.slug)), seen = new Set();
+    const byName = new Map(all.map(x => [String(x.pkg.name).trim().toLowerCase(), x.slug]));
+    const items = list.map((raw, i) => {
+      const r = normPkg(raw, i);
+      if (r.pkg) {
+        // nama yang sama dengan paket yang sudah ada = mengganti paket itu (kecuali file menentukan slug sendiri)
+        const hasSlug = raw && typeof raw === "object" && pick(raw, ["slug"]);
+        const same = byName.get(r.pkg.name.toLowerCase());
+        if (!hasSlug && same) r.pkg.slug = same;
+        let s = r.pkg.slug, n = 2; while (seen.has(s)) s = r.pkg.slug + "-" + n++;
+        if (s !== r.pkg.slug) { r.pkg.slug = s; r.warns.push("Nama kembar di file, diberi akhiran angka."); }
+        seen.add(s); r.status = existing.has(s) ? "ganti" : "baru";
+      }
+      r.include = !r.errs.length; r.n = i + 1; r.label = r.pkg ? r.pkg.name : `Data nomor ${i + 1}`;
+      return r;
+    });
+    const dd = docs ? docs.map(d => ({ src: String(d && d.src || ""), cap: String(d && d.cap || ""), cat: String(d && d.cat || "") })).filter(d => d.src) : [];
+    impPreview = { items, docs: dd };
+  }
+
+  function applyImport(){
+    const sel = impPreview.items.filter(x => x.include && x.pkg);
+    if (!sel.length) return toast("Belum ada paket yang dipilih.", true);
+    if (impMode === "replace") {
+      if (!confirm("Semua paket buatan/ubahan panel yang ada sekarang diganti dengan isi JSON ini. Paket bawaan tidak ikut terhapus. Lanjut?")) return;
+      data.packages = [];
+    }
+    sel.forEach((x, i) => {
+      const p = x.pkg;
+      if (x.imageData) {
+        const ext = (x.imageData.match(/^data:image\/(png|jpe?g|webp)/i)[1] || "jpg").replace("jpeg", "jpg").toLowerCase();
+        const path = `img/${p.slug}-${Date.now()}-${i}.${ext}`;
+        pending[path] = b64Of(x.imageData); pendingUrl[path] = x.imageData; p.image = "/" + path;
+      }
+      const k = data.packages.findIndex(q => q.slug === p.slug);
+      if (k > -1) data.packages[k] = p; else data.packages.push(p);
+      data.hidden = data.hidden.filter(s => s !== p.slug);
+    });
+    let nd = 0;
+    if (impPreview.docs.length && $("#impDocs") && $("#impDocs").checked) {
+      impPreview.docs.forEach(d => { if (!data.docs.some(x => x.src === d.src)) { data.docs.push(d); nd++; } });
+    }
+    impPreview = null; impText = ""; dirty = true; tab = "paket"; render();
+    toast(`${sel.length} paket diimpor${nd ? `, ${nd} foto` : ""}. Tekan Terbitkan ke Website agar tampil.`);
+  }
+
+  async function copyText(t){
+    try { await navigator.clipboard.writeText(t); return true; }
+    catch (e) { const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (_) {} ta.remove(); return ok; }
+  }
+  function exportJson(){
+    const list = impScope === "mine" ? data.packages : allPackages().filter(x => x.status !== "hidden").map(x => x.pkg);
+    return JSON.stringify({ packages: list }, null, 2);
+  }
+
+  function viewImp(){
+    const pv = impPreview;
+    return `<div class="box"><h2>Impor paket dari JSON</h2>
+      <p class="muted" style="margin-top:0">Tempel kode JSON atau pilih file <code>.json</code>. Semua paket di dalamnya dibaca otomatis, lalu Anda bisa memeriksanya dulu sebelum disimpan.</p>
+      <label for="impFile">Pilih file JSON</label><input type="file" id="impFile" accept=".json,.txt,application/json,text/plain">
+      <label for="impText">Atau tempel kode JSON di sini</label>
+      <textarea id="impText" style="min-height:200px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88rem" spellcheck="false" placeholder='{ "packages": [ { "name": "Tour Vietnam 5D4N", ... } ] }'>${esc(impText)}</textarea>
+      ${impErr ? `<div class="err">${esc(impErr)}</div>` : ""}
+      <p><button class="btn" id="impParse">Baca JSON</button> <button class="btn g" id="impClear">Kosongkan</button></p>
+      ${pv ? viewImpPreview(pv) : ""}
+    </div>
+    <div class="box"><h2>Format JSON yang dikenali</h2>
+      <p class="muted" style="margin-top:0">Bisa berupa satu paket, daftar paket, atau <code>{ "packages": [...] }</code>. Yang wajib hanya <b>name</b>, <b>dest</b> (tujuan), dan <b>days</b> (hari). Sisanya boleh dikosongkan atau dilengkapi nanti lewat tombol Ubah.</p>
+      <ul class="steps">
+        <li><b>departures</b>: daftar tanggal berangkat, format <code>2026-12-02</code> atau <code>02/12/2026</code>. Tambah <code>*</code> di belakang untuk high season.</li>
+        <li><b>daily</b>: <code>["2026-11-01", "2027-03-31"]</code> kalau berangkat setiap hari.</li>
+        <li><b>itinerary</b>: daftar hari, tiap hari <code>[judul, isi, hotel]</code>.</li>
+        <li><b>image</b>: nama file yang sudah ada di repo (contoh <code>/img/vietnam.jpg</code>). Boleh juga data gambar base64.</li>
+        <li>Nama kolom bahasa Indonesia juga dikenali, misalnya <code>nama</code>, <code>tujuan</code>, <code>hari</code>, <code>harga</code>, <code>termasuk</code>, <code>syarat</code>.</li>
+        <li>Kalau nama paket sudah ada, paket itu diganti (paket bawaan akan berstatus "Diubah").</li>
+      </ul>
+      <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:800;color:var(--navy)">Lihat contoh lengkap</summary>
+        <pre style="background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:14px;overflow:auto;font-size:.82rem;max-height:340px">${esc(JSON.stringify(SAMPLE, null, 2))}</pre></details>
+      <p><button class="btn o s" id="impSample">Salin contoh format</button> <button class="btn g s" id="impUse">Pakai contoh ini</button></p>
+    </div>
+    <div class="box"><h2>Ekspor paket ke JSON</h2>
+      <p class="muted" style="margin-top:0">Untuk cadangan, atau untuk diedit di tempat lain lalu diimpor lagi.</p>
+      <div class="seg"><label><input type="radio" name="impScope" value="all"${impScope === "all" ? " checked" : ""}> Semua paket yang tampil di website</label>
+        <label><input type="radio" name="impScope" value="mine"${impScope === "mine" ? " checked" : ""}> Hanya paket buatan/ubahan panel</label></div>
+      <p><button class="btn o" id="expCopy">Salin JSON</button> <button class="btn o" id="expDl">Unduh file JSON</button></p>
+    </div>`;
+  }
+  function viewImpPreview(pv){
+    const ok = pv.items.filter(x => x.include && x.pkg).length;
+    return `<div class="sect"><h2 style="margin-top:14px">Hasil bacaan: ${pv.items.length} paket ditemukan</h2>
+      ${pv.items.map((x, i) => {
+        const p = x.pkg;
+        const meta = p ? `${p.days} hari ${p.nights} malam · ${p.price ? rp(p.price) : "Hubungi kami"} · ${p.departures ? p.departures.length + " tanggal" : p.daily ? "setiap hari" : "tanpa tanggal"} · ${p.itinerary ? p.itinerary.length + " hari itinerary" : "tanpa itinerary"}` : "";
+        return `<div class="day" style="${x.errs.length ? "border-color:#f3b3b9" : ""}">
+          <div class="dh"><label style="margin:0;display:flex;gap:10px;align-items:center;cursor:${p ? "pointer" : "not-allowed"}">
+            <input type="checkbox" data-impi="${i}" style="width:auto"${x.include ? " checked" : ""}${p ? "" : " disabled"}>
+            <b>${esc(x.label)}</b></label>
+            ${p ? `<span class="badge ${x.status === "baru" ? "new" : "changed"}" style="position:static">${x.status === "baru" ? "Baru" : "Mengganti yang ada"}</span>` : `<span class="badge hidden" style="position:static">Tidak bisa diimpor</span>`}</div>
+          ${meta ? `<div class="muted" style="margin:4px 0 0 28px">${esc(meta)}</div>` : ""}
+          ${x.errs.map(e => `<div style="color:var(--red2);font-weight:700;margin:4px 0 0 28px">✕ ${esc(e)}</div>`).join("")}
+          ${x.warns.map(w => `<div class="muted" style="margin:2px 0 0 28px">⚠ ${esc(w)}</div>`).join("")}
+        </div>`;
+      }).join("")}
+      <div class="seg" style="margin-top:12px"><label><input type="radio" name="impMode" value="merge"${impMode === "merge" ? " checked" : ""}> Gabungkan (tambah yang baru, ganti yang namanya sama)</label>
+        <label><input type="radio" name="impMode" value="replace"${impMode === "replace" ? " checked" : ""}> Ganti semua paket buatan panel</label></div>
+      ${pv.docs.length ? `<div class="seg"><label><input type="checkbox" id="impDocs" checked> Ikut impor ${pv.docs.length} foto dokumentasi dari file ini</label></div>` : ""}
+      <p style="margin-top:14px"><button class="btn" id="impApply"${ok ? "" : " disabled"}>Impor ${ok} paket</button>
+      <span class="muted">Belum mengubah website sebelum Anda menekan Terbitkan.</span></p></div>`;
+  }
+  function bindImp(){
+    $("#impText").oninput = e => impText = e.target.value;
+    $("#impFile").onchange = async e => {
+      const f = e.target.files[0]; if (!f) return;
+      try { impText = await f.text(); parseImport(); render(); } catch (err) { toast("File tidak bisa dibaca.", true); }
+    };
+    $("#impParse").onclick = () => { impText = $("#impText").value; parseImport(); render(); };
+    $("#impClear").onclick = () => { impText = ""; impPreview = null; impErr = ""; render(); };
+    $("#impSample").onclick = async () => toast((await copyText(JSON.stringify(SAMPLE, null, 2))) ? "Contoh format disalin." : "Gagal menyalin, salin manual dari kotak contoh.", false);
+    $("#impUse").onclick = () => { impText = JSON.stringify(SAMPLE, null, 2); parseImport(); render(); };
+    document.querySelectorAll("[data-impi]").forEach(c => c.onchange = () => { impPreview.items[+c.dataset.impi].include = c.checked; render(); });
+    document.querySelectorAll('input[name="impMode"]').forEach(r => r.onchange = () => impMode = r.value);
+    document.querySelectorAll('input[name="impScope"]').forEach(r => r.onchange = () => impScope = r.value);
+    const ap = $("#impApply"); if (ap) ap.onclick = applyImport;
+    $("#expCopy").onclick = async () => toast((await copyText(exportJson())) ? "JSON disalin." : "Gagal menyalin, gunakan tombol Unduh.", false);
+    $("#expDl").onclick = () => {
+      const a = document.createElement("a"), u = URL.createObjectURL(new Blob([exportJson()], { type: "application/json" }));
+      a.href = u; a.download = "paket-travelkita.json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 1000);
+    };
   }
 
   /* ----- Pengaturan ----- */
