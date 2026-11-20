@@ -17,15 +17,11 @@
 <!-- Pasang Meta Pixel di sini -->
 <!-- Pasang Google Analytics di sini -->
 <style>
-/* Hero dengan foto di tengah: teks di atas, foto rombongan terlihat di bawah */
-.hero.hero-foto{background:linear-gradient(180deg,rgba(14,26,84,.92) 0%,rgba(20,36,107,.80) 38%,rgba(20,36,107,.18) 72%,rgba(14,26,84,.25) 100%),url("/hero-foto.jpg") center 52%/cover no-repeat #14246b;padding:90px 0 380px;text-align:center}
-.hero.hero-foto::before,.hero.hero-foto::after{display:none}
-.hero.hero-foto .hero-grid,.hero.hero-foto .wrap{display:block;max-width:900px;margin-inline:auto}
-.hero.hero-foto p{margin-inline:auto;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.35)}
-.hero.hero-foto h1{text-shadow:0 3px 14px rgba(0,0,0,.4)}
-.hero.hero-foto .hero-actions{justify-content:center}
-.hero.hero-foto .hero-points{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 28px;padding:0;list-style:none;margin:26px 0 0}
-@media (max-width:700px){.hero.hero-foto{background:linear-gradient(180deg,rgba(14,26,84,.95) 0%,rgba(20,36,107,.85) 55%,rgba(20,36,107,0) 100%),url("/hero-foto.jpg") center bottom/100% auto no-repeat #14246b;padding:60px 0 290px}}
+/* Hero: foto latar penuh + lapisan biru TravelKita (gaya Alzaz) */
+.hero.hero-foto{background:linear-gradient(100deg,rgba(14,26,84,.90) 0%,rgba(19,33,107,.74) 48%,rgba(31,63,158,.50) 100%),url("/hero-foto.jpg") center 60%/cover no-repeat #13216b}
+.hero.hero-foto::after{display:none}
+.hero.hero-foto .hero-logo{box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.hero.hero-foto h1,.hero.hero-foto p{text-shadow:0 2px 12px rgba(0,0,0,.35)}
 </style>
 </head>
 <body data-page="home">
@@ -49,6 +45,7 @@
           <li>Respon cepat via WhatsApp</li>
         </ul>
       </div>
+      <img class="hero-logo" src="logo.jpg" alt="Logo TravelKita Tours" width="420" height="auto">
     </div>
   </section>
 
