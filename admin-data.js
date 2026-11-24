@@ -269,7 +269,7 @@ window.ADMIN_DATA = {
       "color": "#14246b,#213a9a",
       "price": 25690000,
       "tag": "",
-      "image": "12d10n-magical-china-double-theme-park-suzhou-wuxi-by-china.png",
+      "image": "12d10n-magical-china-double-theme-park-suzhou-wuxi-by-china.jpg",
       "items": [
         "MAGICAL CHINA DOUBLE THEME PARK",
         "Beijing - Hangzhou - Wuxi - Suzhou - Shanghai, China"
