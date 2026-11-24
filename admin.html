@@ -103,6 +103,8 @@ ol li,ul li{margin:4px 0}
 .btn.ac{color:#fff}.bg.feat{color:#fff}
 .top img{width:auto;height:40px;max-width:150px;padding:2px 6px}
 .lockbox img{width:auto;height:84px;max-width:240px}
+.imgerr{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-size:12px;color:#fff;background:rgba(0,0,0,.35);word-break:break-all}
+.cv{position:relative}
 </style>
 </head>
 <body>
@@ -421,6 +423,17 @@ function imgSrc(p) {
   return IMG_RE.test(path) ? path : "";
 }
 
+/* gambar gagal dimuat: coba jalur dari akar situs, lalu tampilkan pesan yang jelas */
+document.addEventListener("error", e => {
+  const im = e.target;
+  if (!im || im.tagName !== "IMG" || !im.dataset.path) return;
+  const path = im.dataset.path;
+  if (!im.dataset.retry && !/^(data:|https?:)/i.test(path)) { im.dataset.retry = "1"; im.src = "/" + path; return; }
+  const m = document.createElement("div"); m.className = "imgerr";
+  m.textContent = "Gambar tidak termuat: " + path + " (belum terunggah / website belum selesai update)";
+  im.replaceWith(m);
+}, true);
+
 /* ---------- daftar paket ---------- */
 const STATUS = { builtin: ["", "BAWAAN"], changed: ["mod", "DIUBAH"], new: ["new", "BARU"], hidden: ["hd", "DISEMBUNYIKAN"] };
 function renderGrid() {
@@ -431,7 +444,7 @@ function renderGrid() {
     const cs = /^#[0-9a-f]{3,8},#[0-9a-f]{3,8}$/i.test(String(p.color || "")) ? p.color.split(",") : COLORS[0].split(",");
     const dates = p.departures ? p.departures.length + " tanggal" : p.departuresCompact ? "Tanggal ringkas" : p.daily ? "Harian" : "Tanggal belum diisi";
     return `<div class="pc${x.status === "hidden" ? " hid" : ""}">
-      <div class="cv" style="background:linear-gradient(135deg,${esc(cs[0])},${esc(cs[1] || cs[0])})">${im ? `<img src="${esc(im)}" alt="">` : ""}</div>
+      <div class="cv" style="background:linear-gradient(135deg,${esc(cs[0])},${esc(cs[1] || cs[0])})">${im ? `<img src="${esc(im)}" data-path="${esc(stripSlash(p.image))}" alt="">` : ""}</div>
       <div class="bd"><div>${p.featured ? '<span class="bg feat">UNGGULAN</span>' : ""}<span class="bg ${st[0]}">${st[1]}</span></div>
         <h3>${esc(p.name)}</h3>
         <div class="m">${esc(p.dest)} · ${esc(p.days)}H${esc(p.nights)}M · ${esc(p.type)}</div>
@@ -519,7 +532,7 @@ function viewForm() {
       <div class="seg"><label><input type="checkbox" id="fFeat"${p.featured ? " checked" : ""}> Jadikan paket unggulan</label></div>
       <label for="fImg">Gambar / brosur paket <small>(opsional)</small></label>
       <input id="fImg" type="file" accept="image/*">
-      <img class="imgprev" id="fPrev" ${im ? `src="${esc(im)}"` : 'style="display:none"'} alt="">
+      <img class="imgprev" id="fPrev" ${im ? `src="${esc(im)}" data-path="${esc(stripSlash(p.image))}"` : 'style="display:none"'} alt="">
       <label for="fImgPath">Atau nama file gambar yang sudah ada di repo <small>(mis. tour-bali.png)</small></label>
       <input id="fImgPath" type="text" value="${esc(curImg)}" placeholder="nama-file.jpg">
       <p class="hint">Kalau Anda memilih file di atas, nama file ini diabaikan.</p>
@@ -665,7 +678,7 @@ function saveForm() {
   if (flags.length) pkg.flags = flags;
   if ($("fFeat").checked) pkg.featured = true;
   let newImg = null;
-  if (e.img) { const path = "img/" + slug + "-" + Date.now() + ".jpg"; newImg = path; pkg.image = path; }
+  if (e.img) { const path = "img/" + slug.slice(0, 30).replace(/-+$/, "") + "-" + Date.now().toString(36) + ".jpg"; newImg = path; pkg.image = path; }
   const sched = lines($("fSched").value); if (sched.length) pkg.schedule = sched;
   if (e.mode === "dates") pkg.departures = sortDeps(e.deps);
   if (e.mode === "daily") pkg.daily = e.daily.slice();
@@ -861,7 +874,7 @@ function applyImport() {
       const p = x.pkg;
       if (x.imageData) {
         const ext = (x.imageData.match(/^data:image\/(png|jpe?g|webp)/i)[1] || "jpg").replace("jpeg", "jpg").toLowerCase();
-        const path = "img/" + p.slug + "-" + Date.now() + "-" + i + "." + ext;
+        const path = "img/" + p.slug.slice(0, 30).replace(/-+$/, "") + "-" + Date.now().toString(36) + i + "." + ext;
         pending[path] = x.imageData.split(",")[1]; pendingUrl[path] = x.imageData; p.image = path;
       }
       const k = d.packages.findIndex(q => q.slug === p.slug);
@@ -918,7 +931,7 @@ function renderDocs() {
     <button class="btn dng sm" data-drm="${i}">Buang</button></div></div>`).join("");
   $("docDraftBar").hidden = !docDraft.length; $("dokAdd").textContent = "Tambahkan " + docDraft.length + " foto";
   const docs = data ? data.docs : [];
-  $("docList").innerHTML = docs.map((d, i) => `<div class="doc"><img src="${esc(imgSrc(d.src))}" alt="">
+  $("docList").innerHTML = docs.map((d, i) => `<div class="doc"><img src="${esc(imgSrc(d.src))}" data-path="${esc(stripSlash(d.src))}" alt="">
     <div class="bd"><input type="text" maxlength="200" data-ecap="${i}" value="${esc(d.cap)}" placeholder="Keterangan foto">
     <select data-ecat="${i}">${catOpts(d.cat)}</select>
     ${pending[stripSlash(d.src)] ? '<span class="bg new">BELUM DIUNGGAH</span>' : ""}
