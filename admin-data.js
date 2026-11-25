@@ -267,15 +267,12 @@ window.ADMIN_DATA = {
       "days": 12,
       "nights": 10,
       "color": "#14246b,#213a9a",
-      "price": null,
+      "price": 25690000,
       "tag": "",
       "image": "img/12d10n-magical-china-double-th-mwvksbcs.jpg",
       "items": [
         "Beijing - Hangzhou - Wuxi - Suzhou - Shanghai, China",
         "12 hari 10 malam"
-      ],
-      "flags": [
-        "cn"
       ],
       "itinerary": [
         [
